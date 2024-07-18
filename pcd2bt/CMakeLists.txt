@@ -1,5 +1,5 @@
 # declare cmake version
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.15...3.29)
 
 # set project name
 project(pcd2bt)
@@ -12,6 +12,8 @@ message(CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}")
 find_package(PCL REQUIRED)
 find_package(fcl REQUIRED)
 find_package(octomap REQUIRED)
+set(BIND11_FINDPYTHON ON)
+find_package(pybind11 CONFIG REQUIRED)
 
 # include directories
 include_directories(${OCTOMAP_INCLUDE_DIRS})
@@ -26,6 +28,11 @@ target_link_libraries(collision_detector
                       ${PCL_LIBRARIES}
                       ${OCTOMAP_LIBRARIES}
                       ${FCL_LIBRARIES})
+
+# build python bindings
+pybind11_add_module(pybind_collision_detector src/pybind_collision_detector.cpp)
+target_link_libraries(pybind_collision_detector PRIVATE collision_detector)
+install(TARGETS pybind_collision_detector DESTINATION .)
 
 # add executable
 add_executable(pcd2bt src/main.cpp)
