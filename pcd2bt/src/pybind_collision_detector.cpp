@@ -6,7 +6,7 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(pybind_collision_detector, m) {
   py::class_<CollisionDetector>(m, "CollisionDetector")
-      .def(py::init<const std::string &>())
+      .def(py::init<const std::string &, const CollisionDetectorOptions>())
       .def("detectCollision", [](CollisionDetector &self, float x, float y,
                                  float z, float yaw, float pitch, float roll) {
         // Turn x, y, z, yaw, pitch, roll into a eigen transform
@@ -20,4 +20,15 @@ PYBIND11_MODULE(pybind_collision_detector, m) {
 
         return self.detectCollision(transform);
       });
+
+
+  // bind CollisionDetectorOptions struct to python
+  py::class_<CollisionDetectorOptions>(m, "CollisionDetectorOptions")
+      .def(py::init<>())
+      .def_readwrite("x_min", &CollisionDetectorOptions::x_min)
+      .def_readwrite("x_max", &CollisionDetectorOptions::x_max)
+      .def_readwrite("y_min", &CollisionDetectorOptions::y_min)
+      .def_readwrite("y_max", &CollisionDetectorOptions::y_max)
+      .def_readwrite("z_min", &CollisionDetectorOptions::z_min)
+      .def_readwrite("z_max", &CollisionDetectorOptions::z_max);
 }
