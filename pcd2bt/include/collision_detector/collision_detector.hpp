@@ -72,9 +72,9 @@ public:
     // create an octomap pointcloud object and copy all points
     octomap::Pointcloud octomap_cloud;
     for (size_t i = 0; i < cropped_cloud.points.size(); i++) {
-      octomap_cloud.push_back(cropped_cloud.points[i].x,
-                              cropped_cloud.points[i].y,
-                              cropped_cloud.points[i].z);
+      octomap_cloud.push_back(cropped_cloud.points[i].x - offset_.x(),
+                              cropped_cloud.points[i].y - offset_.y(),
+                              cropped_cloud.points[i].z - offset_.z());
     }
 
     // write the pointcloud to the octree
@@ -107,7 +107,10 @@ public:
   bool detectCollision(fcl::Transform3<double> transform) {
     // set the transform of the box object
     fcl::Transform3<double> box_transform = fcl::Transform3<double>::Identity();
-    box_transform.translation() = transform.translation();
+    box_transform.translation() =
+        Eigen::Vector3d(transform.translation().x() - offset_.x(),
+                        transform.translation().y() - offset_.y(),
+                        transform.translation().z() - offset_.z());
     box_obj_->setTransform(box_transform);
 
     // create a collision request object
