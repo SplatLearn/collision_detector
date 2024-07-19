@@ -37,3 +37,7 @@ install(TARGETS pybind_collision_detector DESTINATION .)
 # add executable
 add_executable(pcd2bt src/main.cpp)
 target_link_libraries(pcd2bt collision_detector)
+
+# add executable
+add_executable(test_box_box_collision test/test_box_box_collision.cpp)
+target_link_libraries(test_box_box_collision ${FCL_LIBRARIES})
