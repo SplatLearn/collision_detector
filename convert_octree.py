@@ -5,10 +5,6 @@ import json
 print("Testing IO for point cloud ...")
 pcd = o3d.io.read_point_cloud("./point_cloud.pcd")
 
-print(pcd)
-print(np.asarray(pcd.points))
-# o3d.visualization.draw(pcd)
-
 pts = np.asarray(pcd.points)
 pts_max = np.max(pts, axis=0)
 pts_min = np.min(pts, axis=0)
@@ -245,7 +241,7 @@ class BinaryOctree:
         #             self.root.children[i] = self.root.children[i].children[7 - i]
 
 
-bo = BinaryOctree()
+bo = BinaryOctree("point_cloud.bt")
 bo.squash()
 bo.serialize("octree_dumped.json")
 
@@ -260,7 +256,7 @@ print("octree division")
 # cropped_pcd = o3d.io.read_point_cloud("./cropped_point_cloud.pcd")
 # o3d.io.write_point_cloud("cropped_point_cloud.pcd", cropped_pcd)
 
-o3d.visualization.draw([cropped_pcd, octree])
+o3d.visualization.draw([octree])
 # vis = o3d.visualization.Visualizer()
 # vis.create_window()
 # vis.add_geometry(octree)
