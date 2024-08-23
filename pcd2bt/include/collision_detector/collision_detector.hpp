@@ -97,7 +97,7 @@ public:
 
     // create a box object in fcl
     box_ =
-        std::make_shared<fcl::Box<double>>(resolution, resolution, resolution);
+        std::make_shared<fcl::Box<double>>(0.4, 0.4, 0.1);
 
     // create a collision object in fcl from the box object
     box_obj_ = std::make_shared<fcl::CollisionObject<double>>(
