@@ -19,7 +19,9 @@ Build the project using cmake
 
 ## Usage
 
-The compilation process produces file called `pybind_collision_detector.*.so`. This file need to be copied to be within PYTHONPATH. Then from python:
+The compilation process produces file called `pybind_collision_detector.*.so`. This file need to be copied to be within PYTHONPATH. Note this file is not portable. It is very specific to the machine architecture and python version.
+
+To use the API from Python:
 
 ```python
 from nerfgym.pybind_collision_detector import (
