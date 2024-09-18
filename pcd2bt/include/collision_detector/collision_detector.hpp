@@ -16,6 +16,11 @@ struct CollisionDetectorOptions {
   double y_max{std::numeric_limits<double>::max()};
   double z_min{std::numeric_limits<double>::lowest()};
   double z_max{std::numeric_limits<double>::max()};
+  double camera_box_size_x{0.4};
+  double camera_box_size_y{0.4};
+  double camera_box_size_z{0.1};
+  bool verbose{false};
+  bool debug_export_artefacts{false};
 };
 
 // Detect collision between a point cloud and a bounding box
@@ -33,9 +38,12 @@ public:
       throw std::runtime_error("Couldn't read file");
     }
 
+    verbose = options.verbose;
+
     // print the number of points in the pointcloud
-    std::cout << "Loaded " << cloud->width * cloud->height
-              << " data points from " << pcd_file << std::endl;
+    if (verbose)
+      std::cout << "Loaded " << cloud->width * cloud->height
+                << " data points from " << pcd_file << std::endl;
 
     // crop the pointcloud to the specified bounding box
     pcl::CropBox<pcl::PointXYZ> crop_filter;
@@ -48,10 +56,12 @@ public:
     crop_filter.filter(cropped_cloud);
 
     // write the cropped pointcloud to a pcd file
-    std::string filename = pcd_file;
-    filename =
-        filename.replace(filename.end() - 4, filename.end(), "_cropped.pcd");
-    pcl::io::savePCDFileASCII(filename, cropped_cloud);
+    if (options.debug_export_artefacts) {
+      std::string filename = pcd_file;
+      filename =
+          filename.replace(filename.end() - 4, filename.end(), "_cropped.pcd");
+      pcl::io::savePCDFileASCII(filename, cropped_cloud);
+    }
 
     // find the min and max z values in the cropped pointcloud
     Eigen::Vector4f min, max;
@@ -64,10 +74,13 @@ public:
         max_range / 64 * 1.01; // inflate the bbox to cover all points
 
     offset_ = (max + min) / 2;
-    std::cout << "max: " << max << std::endl;
-    std::cout << "min: " << min << std::endl;
-    std::cout << "resolution: " << resolution << std::endl;
-    std::cout << "offset: " << offset_ << std::endl;
+
+    if (verbose) {
+      std::cout << "max: " << max << std::endl;
+      std::cout << "min: " << min << std::endl;
+      std::cout << "resolution: " << resolution << std::endl;
+      std::cout << "offset: " << offset_ << std::endl;
+    }
 
     // create an octomap pointcloud object and copy all points
     octomap::Pointcloud octomap_cloud;
@@ -83,10 +96,13 @@ public:
     tree_->updateInnerOccupancy();
 
     // save the octree to a binary file
-    filename = pcd_file;
-    filename = filename.replace(filename.end() - 4, filename.end(), ".bt");
-    tree_->writeBinary(filename);
-    std::cout << "Saved " << filename << std::endl;
+    if (options.debug_export_artefacts) {
+      auto filename = pcd_file;
+      filename = filename.replace(filename.end() - 4, filename.end(), ".bt");
+      tree_->writeBinary(filename);
+      if (verbose)
+        std::cout << "Saved " << filename << std::endl;
+    }
 
     // create a new octree object in fcl from the octree object in octomap
     tree_fcl_ = std::make_shared<fcl::OcTree<double>>(tree_);
@@ -96,8 +112,9 @@ public:
         tree_fcl_, Eigen::Isometry3d::Identity());
 
     // create a box object in fcl
-    box_ =
-        std::make_shared<fcl::Box<double>>(0.4, 0.4, 0.1);
+    box_ = std::make_shared<fcl::Box<double>>(options.camera_box_size_x,
+                                              options.camera_box_size_y,
+                                              options.camera_box_size_z);
 
     // create a collision object in fcl from the box object
     box_obj_ = std::make_shared<fcl::CollisionObject<double>>(
@@ -135,4 +152,7 @@ private:
   std::shared_ptr<fcl::OcTree<double>> tree_fcl_{nullptr};
   std::shared_ptr<fcl::CollisionObject<double>> tree_obj_{nullptr};
   std::shared_ptr<fcl::CollisionObject<double>> box_obj_{nullptr};
+
+  // debug option
+  bool verbose{false};
 };

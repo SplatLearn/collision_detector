@@ -30,5 +30,10 @@ PYBIND11_MODULE(pybind_collision_detector, m) {
       .def_readwrite("y_min", &CollisionDetectorOptions::y_min)
       .def_readwrite("y_max", &CollisionDetectorOptions::y_max)
       .def_readwrite("z_min", &CollisionDetectorOptions::z_min)
-      .def_readwrite("z_max", &CollisionDetectorOptions::z_max);
+      .def_readwrite("z_max", &CollisionDetectorOptions::z_max)
+      .def_readwrite("camera_box_size_x", &CollisionDetectorOptions::camera_box_size_x)
+      .def_readwrite("camera_box_size_y", &CollisionDetectorOptions::camera_box_size_y)
+      .def_readwrite("camera_box_size_z", &CollisionDetectorOptions::camera_box_size_z)
+      .def_readwrite("verbose", &CollisionDetectorOptions::verbose)
+      .def_readwrite("debug_export_artefacts", &CollisionDetectorOptions::debug_export_artefacts);
 }
